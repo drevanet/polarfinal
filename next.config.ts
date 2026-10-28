@@ -2,6 +2,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  trailingSlash: true,
+
   images: {
     remotePatterns: [
       {
@@ -11,15 +13,13 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Allow production builds to complete despite ESLint errors.
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // Allow production builds to complete despite TypeScript errors.
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  poweredByHeader: false,
+
+  reactStrictMode: true,
 };
 
 export default nextConfig;

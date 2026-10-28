@@ -1,0 +1,36 @@
+{
+  "name": "revabox-shot-studio",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+   "@neondatabase/serverless": "latest",
+    "@polar-sh/nextjs": "1.1.0",
+    "@polar-sh/sdk": "1.0.2",
+    "@prisma/client": "^7.10.1",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "jose": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

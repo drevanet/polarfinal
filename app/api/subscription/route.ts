@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getPolarCustomerState } from "@/lib/polar";
+import { getPolarSubscriptionByUserId } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,36 +21,48 @@ export async function GET() {
       );
     }
 
-    const state = await getPolarCustomerState(user.id);
+    const subscription = await getPolarSubscriptionByUserId(user.id);
 
-    // No matching Polar customer means no subscription
-    // has been associated with this external user ID.
-    if (!state) {
+    if (!subscription) {
       return NextResponse.json({
         authenticated: true,
         active: false,
-        subscriptions: [],
         customerFound: false,
+        subscriptions: [],
       });
     }
 
-    const activeSubscriptions = Array.isArray(
-      state.active_subscriptions
-    )
-      ? state.active_subscriptions
-      : [];
+    const status = String(subscription.status).toLowerCase();
+
+    const periodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end)
+      : null;
+
+    const periodValid =
+      periodEnd !== null &&
+      !Number.isNaN(periodEnd.getTime()) &&
+      periodEnd.getTime() > Date.now();
+
+    // Trialing subscriptions may also grant access.
+    // A cancellation scheduled for period end does not
+    // immediately remove access while the paid period remains valid.
+    const active =
+      (status === "active" || status === "trialing") &&
+      periodValid;
 
     return NextResponse.json({
       authenticated: true,
-      active: activeSubscriptions.length > 0,
+      active,
       customerFound: true,
-      subscriptions: activeSubscriptions.map((subscription) => ({
-        id: subscription.id,
-        productId: subscription.product_id,
-        status: subscription.status,
-        currentPeriodEnd: subscription.current_period_end,
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      })),
+      subscriptions: [
+        {
+          id: subscription.subscription_id,
+          productId: subscription.product_id,
+          status: subscription.status,
+          currentPeriodEnd: subscription.current_period_end,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        },
+      ],
     });
   } catch (error) {
     console.error("Subscription lookup failed:", error);
